@@ -12,11 +12,8 @@ import FastImage from "react-native-fast-image";
 
 import Modal from "react-native-modal";
 
-import ArrowWhiteIcon from "../assets/icons/arrowwhite.svg";
+import XmarkWhiteIcon from "../assets/icons/xmarkwhite.svg";
 import Video, { VideoRef } from "react-native-video";
-import { Bar } from "react-native-progress";
-
-import PlayIcon from "../assets/icons/play.svg";
 
 type Props = {
   postImageModalVisible: boolean;
@@ -105,7 +102,7 @@ const PostImageModal = ({
                   togglePlay();
                 }}
               >
-                <ArrowWhiteIcon width={28} height={28} />
+                <XmarkWhiteIcon width={28} height={28} />
               </TouchableOpacity>
             </View>
 

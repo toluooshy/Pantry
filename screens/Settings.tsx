@@ -4,35 +4,35 @@ import axios from "axios";
 import {
   View,
   Text,
-  Button,
+  Dimensions,
   Keyboard,
   TouchableWithoutFeedback,
   ScrollView,
   TouchableOpacity,
 } from "react-native";
 
-import Post from "../components/Posts/Post";
 import {
-  AuthorsObject,
   Credentials,
-  InstancesObject,
-  PreferencesObject,
   TopicsObject,
+  AuthorsObject,
+  InstancesObject,
 } from "../types";
+
 import DocumentPicker from "react-native-document-picker";
 import Papa from "papaparse";
 import PostAuthor from "@/components/Accounts/AccountChip";
-
-import PlusIcon from "../assets/icons/plus.svg";
-import MinusIcon from "../assets/icons/minus.svg";
 
 type Props = {
   navigation: any;
   credentials: Credentials;
   setCredentials: (data: Credentials) => void;
   updateCredentials: (data: Credentials) => void;
-  currentPreferences: PreferencesObject;
-  setCurrentPreferences: (data: PreferencesObject) => void;
+  currentTopics: TopicsObject;
+  setCurrentTopics: (data: TopicsObject) => void;
+  currentAuthors: AuthorsObject;
+  setCurrentAuthors: (data: AuthorsObject) => void;
+  currentInstances: InstancesObject;
+  setCurrentInstances: (data: InstancesObject) => void;
 };
 
 const Settings = ({
@@ -40,22 +40,19 @@ const Settings = ({
   credentials,
   setCredentials,
   updateCredentials,
-  currentPreferences,
-  setCurrentPreferences,
+  currentTopics,
+  setCurrentTopics,
+  currentAuthors,
+  setCurrentAuthors,
+  currentInstances,
+  setCurrentInstances,
 }: Props) => {
+  const width = Dimensions.get("screen").width;
+  const height = Dimensions.get("screen").height;
+
   const [selectedFile, setSelectedFile] = useState<any>(null);
   const [jsonData, setJsonData] = useState<any>(null);
   const [mastodonAccounts, setMastodonAccounts] = useState<any>({});
-
-  const [currentTopics, setCurrentTopics] = useState<TopicsObject>(
-    currentPreferences.topics
-  );
-  const [currentAuthors, setCurrentAuthors] = useState<AuthorsObject>(
-    currentPreferences.authors
-  );
-  const [currentInstances, setCurrentInstances] = useState<InstancesObject>(
-    currentPreferences.instances
-  );
 
   useEffect(() => {
     console.log("preferences updated");
@@ -68,21 +65,24 @@ const Settings = ({
   ) => {
     const tempCredentials = credentials;
     if (
-      Object.keys(tempCredentials.preferences[preference]).indexOf(item) !== -1
+      preference === "topics" ||
+      preference === "authors" ||
+      preference === "instances"
     ) {
-      tempCredentials.preferences[preference][item] += incrementing ? 1 : -1;
-    } else {
-      tempCredentials.preferences[preference] = {
-        ...tempCredentials?.preferences?.[preference],
-        [item]: incrementing ? 1 : -1,
-      };
+      if (Object.keys(tempCredentials[preference]).indexOf(item) !== -1) {
+        tempCredentials[preference][item] += incrementing ? 1 : -1;
+      } else {
+        tempCredentials[preference] = {
+          ...tempCredentials?.[preference],
+          [item]: incrementing ? 1 : -1,
+        };
+      }
     }
     setCredentials(tempCredentials);
     updateCredentials(tempCredentials);
-    setCurrentPreferences(tempCredentials.preferences);
-    setCurrentTopics(tempCredentials.preferences.topics);
-    setCurrentAuthors(tempCredentials.preferences.authors);
-    setCurrentInstances(tempCredentials.preferences.instances);
+    setCurrentTopics(tempCredentials.topics);
+    setCurrentAuthors(tempCredentials.authors);
+    setCurrentInstances(tempCredentials.instances);
   };
 
   const handleFileSelect = async () => {
@@ -274,6 +274,7 @@ const Settings = ({
                 <PostAuthor
                   server={item.split(":")[1]}
                   id={item.split(":")[2]}
+                  width={width - 50}
                 />
               </View>
               <View style={{ marginTop: -10 }}>

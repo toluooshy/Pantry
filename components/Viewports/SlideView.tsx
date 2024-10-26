@@ -33,7 +33,7 @@ const SlideView = ({
       style={{ margin: 0 }}
       propagateSwipe
     >
-      <SafeAreaView style={{ flex: 0, backgroundColor: "#101010" }} />
+      <SafeAreaView style={{ flex: 0, backgroundColor: "#EA7D87" }} />
       <SafeAreaView
         style={{
           flex: 1,
@@ -42,7 +42,7 @@ const SlideView = ({
           flexDirection: "column",
           alignItems: "center",
           margin: 0,
-          backgroundColor: "#f9fafb",
+          backgroundColor: "#FEF6F7",
         }}
       >
         <View
@@ -52,7 +52,7 @@ const SlideView = ({
             flexDirection: "row",
             justifyContent: "space-between",
             width: "100%",
-            backgroundColor: "#101010",
+            backgroundColor: "#EA7D87",
             paddingTop: 5,
             marginBottom: 10,
             paddingBottom: 5,

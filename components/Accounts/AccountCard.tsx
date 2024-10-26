@@ -1,15 +1,17 @@
-import React, { useEffect, useRef, useState } from "react";
-import axios from "axios";
-import { Pressable, Text, TouchableOpacity, View } from "react-native";
+import React, { useState } from "react";
+import { Pressable, Text, View } from "react-native";
 
 import FastImage from "react-native-fast-image";
 
 import {
-  ArchiveObject,
   Credentials,
   PostObject,
-  PreferencesObject,
+  ArchiveObject,
+  TopicsObject,
+  AuthorsObject,
+  InstancesObject,
 } from "../../types";
+import AccountModal from "@/modals/AccountModal";
 
 type Props = {
   data: any;
@@ -18,8 +20,12 @@ type Props = {
   updateCredentials: (data: Credentials) => void;
   currentArchive: ArchiveObject;
   setCurrentArchive: (data: ArchiveObject) => void;
-  currentPreferences: PreferencesObject;
-  setCurrentPreferences: (data: PreferencesObject) => void;
+  currentTopics: TopicsObject;
+  setCurrentTopics: (data: TopicsObject) => void;
+  currentAuthors: AuthorsObject;
+  setCurrentAuthors: (data: AuthorsObject) => void;
+  currentInstances: InstancesObject;
+  setCurrentInstances: (data: InstancesObject) => void;
 };
 
 const AccountCard = ({
@@ -29,13 +35,19 @@ const AccountCard = ({
   updateCredentials,
   currentArchive,
   setCurrentArchive,
-  currentPreferences,
-  setCurrentPreferences,
+  currentTopics,
+  setCurrentTopics,
+  currentAuthors,
+  setCurrentAuthors,
+  currentInstances,
+  setCurrentInstances,
 }: Props) => {
   const accountIdentifier = `${data.acct}:mastodon.social:${data.id}`;
   const [isWatching, setIsWatching] = useState<boolean>(
-    !!currentPreferences.authors[accountIdentifier]
+    !!currentAuthors[accountIdentifier]
   );
+  const [accountModalVisible, setAccountModalVisible] =
+    useState<boolean>(false);
 
   const reformatNumber = (num: number) => {
     if (num < 1000) {
@@ -54,19 +66,28 @@ const AccountCard = ({
     }
   };
 
+  const truncatedText = (text: string, max: number) => {
+    if (text.length > max) {
+      return text.slice(0, max - 3) + "...";
+    }
+    return text;
+  };
+
   const updateAuthors = (author: string) => {
     const tempCredentials = credentials;
     if (isWatching) {
-      delete tempCredentials.preferences.authors[author];
+      delete tempCredentials.authors[author];
     } else {
-      tempCredentials.preferences.authors = {
-        ...tempCredentials?.preferences?.authors,
+      tempCredentials.authors = {
+        ...tempCredentials?.authors,
         [author]: 1,
       };
     }
     setCredentials(tempCredentials);
     updateCredentials(tempCredentials);
-    setCurrentPreferences(tempCredentials.preferences);
+    setCurrentTopics(tempCredentials.topics);
+    setCurrentAuthors(tempCredentials.authors);
+    setCurrentInstances(tempCredentials.instances);
     setIsWatching(!isWatching);
   };
 
@@ -103,13 +124,22 @@ const AccountCard = ({
           justifyContent: "space-between",
         }}
       >
-        <View>
-          <Text style={{ fontWeight: 600 }}>{data.display_name}</Text>
-          <Text style={{ color: "#888888" }}>{data.acct}</Text>
+        <Pressable
+          style={{ flex: 1 }}
+          onPress={() => {
+            setAccountModalVisible(true);
+          }}
+        >
+          <Text style={{ fontWeight: 600 }}>
+            {truncatedText(data.display_name, 36)}
+          </Text>
+          <Text style={{ color: "#888888" }}>
+            {truncatedText(data.acct, 32)}
+          </Text>
           <Text style={{ marginTop: 10 }}>{`${reformatNumber(
             data.followers_count
           )}${data.followers_count !== 1 ? " followers" : " follower"}`}</Text>
-        </View>
+        </Pressable>
         <Pressable
           style={{
             backgroundColor: isWatching ? "#ffffff" : "#EA7D87",
@@ -140,6 +170,24 @@ const AccountCard = ({
           </Text>
         </Pressable>
       </View>
+      {accountModalVisible ? (
+        <AccountModal
+          account={data}
+          accountModalVisible={accountModalVisible}
+          setAccountModalVisible={setAccountModalVisible}
+          credentials={credentials}
+          setCredentials={setCredentials}
+          updateCredentials={updateCredentials}
+          currentArchive={currentArchive}
+          setCurrentArchive={setCurrentArchive}
+          currentTopics={currentTopics}
+          setCurrentTopics={setCurrentTopics}
+          currentAuthors={currentAuthors}
+          setCurrentAuthors={setCurrentAuthors}
+          currentInstances={currentInstances}
+          setCurrentInstances={setCurrentInstances}
+        />
+      ) : null}
     </View>
   );
 };

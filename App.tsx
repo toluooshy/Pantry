@@ -1,6 +1,14 @@
 import { useState, useEffect } from "react";
 
-import { Text, View, StatusBar, Dimensions, SafeAreaView } from "react-native";
+import {
+  Text,
+  View,
+  StatusBar,
+  Dimensions,
+  SafeAreaView,
+  Platform,
+  Pressable,
+} from "react-native";
 import FastImage from "react-native-fast-image";
 
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
@@ -18,7 +26,13 @@ import ExploreIcon from "./assets/icons/explore.svg";
 import ArchiveIcon from "./assets/icons/archive.svg";
 import SettingsIcon from "./assets/icons/settings.svg";
 
-import { ArchiveObject, Credentials, PreferencesObject } from "./types";
+import {
+  Credentials,
+  ArchiveObject,
+  TopicsObject,
+  AuthorsObject,
+  InstancesObject,
+} from "./types";
 import Explore from "./screens/Explore";
 
 const Tab = createBottomTabNavigator();
@@ -34,13 +48,22 @@ export default function App() {
       ? (credentials.archive as ArchiveObject)
       : ({} as ArchiveObject)
   );
-
-  const [currentPreferences, setCurrentPreferences] =
-    useState<PreferencesObject>(
-      !!credentials
-        ? (credentials.preferences as PreferencesObject)
-        : ({} as PreferencesObject)
-    );
+  const [currentTopics, setCurrentTopics] = useState<TopicsObject>(
+    !!credentials ? (credentials.topics as TopicsObject) : ({} as TopicsObject)
+  );
+  const [currentAuthors, setCurrentAuthors] = useState<AuthorsObject>(
+    !!credentials
+      ? (credentials.authors as AuthorsObject)
+      : ({} as AuthorsObject)
+  );
+  const [currentInstances, setCurrentInstances] = useState<InstancesObject>(
+    !!credentials
+      ? (credentials.instances as InstancesObject)
+      : ({} as InstancesObject)
+  );
+  const [homeRefreshTimestamp, setHomeRefreshTimestamp] = useState<number>(
+    Date.now()
+  );
 
   const [welcomeModalVisible, setWelcomeModalVisible] =
     useState<boolean>(false);
@@ -52,22 +75,24 @@ export default function App() {
         const tempCredentials = JSON.parse(data);
         setCredentials(tempCredentials);
         setCurrentArchive(tempCredentials.archive);
-        setCurrentPreferences(tempCredentials.preferences);
+        setCurrentTopics(tempCredentials.topics);
+        setCurrentAuthors(tempCredentials.authors);
+        setCurrentInstances(tempCredentials.instances);
         setWelcomeModalVisible(false);
       } else {
         setWelcomeModalVisible(true);
         const newCredentials = {
-          preferences: {
-            topics: {},
-            authors: {},
-            instances: { "mastodon.social": 1 },
-          },
           archive: {},
+          topics: {},
+          authors: {},
+          instances: { "mastodon.social": 1 },
         };
         setCredentials(newCredentials);
         updateCredentials(newCredentials);
         setCurrentArchive(newCredentials.archive);
-        setCurrentPreferences(newCredentials.preferences);
+        setCurrentTopics(newCredentials.topics);
+        setCurrentAuthors(newCredentials.authors);
+        setCurrentInstances(newCredentials.instances);
         console.log("Welcome to pantry!");
       }
     } catch (error) {
@@ -96,13 +121,16 @@ export default function App() {
   };
 
   useEffect(() => {
-    // clearCredentials();
     getCredentials();
   }, []);
 
   return (
     <NavigationContainer>
-      {!!credentials && !!currentPreferences ? (
+      {!!credentials &&
+      !!currentArchive &&
+      !!currentTopics &&
+      !!currentAuthors &&
+      !!currentInstances ? (
         <Tab.Navigator
           screenOptions={({ route }) => ({
             headerTintColor: "#ffffff",
@@ -142,7 +170,7 @@ export default function App() {
                   <View
                     style={{
                       width: width,
-                      height: 40,
+                      height: Platform.OS === "ios" ? 40 : 57,
                       marginLeft: -16,
                       paddingLeft: 10,
                       paddingRight: 10,
@@ -161,6 +189,17 @@ export default function App() {
                   </View>
                 </SafeAreaView>
               ),
+              tabBarButton: (props: any) => (
+                <Pressable
+                  {...props}
+                  onPress={() => {
+                    props.onPress();
+                    if (props.accessibilityState.selected) {
+                      setHomeRefreshTimestamp(Date.now());
+                    }
+                  }}
+                />
+              ),
             }}
           >
             {(props) => (
@@ -171,8 +210,13 @@ export default function App() {
                 updateCredentials={updateCredentials}
                 currentArchive={currentArchive}
                 setCurrentArchive={setCurrentArchive}
-                currentPreferences={currentPreferences}
-                setCurrentPreferences={setCurrentPreferences}
+                currentTopics={currentTopics}
+                setCurrentTopics={setCurrentTopics}
+                currentAuthors={currentAuthors}
+                setCurrentAuthors={setCurrentAuthors}
+                currentInstances={currentInstances}
+                setCurrentInstances={setCurrentInstances}
+                homeRefreshTimestamp={homeRefreshTimestamp}
               />
             )}
           </Tab.Screen>
@@ -223,8 +267,12 @@ export default function App() {
                 updateCredentials={updateCredentials}
                 currentArchive={currentArchive}
                 setCurrentArchive={setCurrentArchive}
-                currentPreferences={currentPreferences}
-                setCurrentPreferences={setCurrentPreferences}
+                currentTopics={currentTopics}
+                setCurrentTopics={setCurrentTopics}
+                currentAuthors={currentAuthors}
+                setCurrentAuthors={setCurrentAuthors}
+                currentInstances={currentInstances}
+                setCurrentInstances={setCurrentInstances}
               />
             )}
           </Tab.Screen>
@@ -275,8 +323,12 @@ export default function App() {
                 updateCredentials={updateCredentials}
                 currentArchive={currentArchive}
                 setCurrentArchive={setCurrentArchive}
-                currentPreferences={currentPreferences}
-                setCurrentPreferences={setCurrentPreferences}
+                currentTopics={currentTopics}
+                setCurrentTopics={setCurrentTopics}
+                currentAuthors={currentAuthors}
+                setCurrentAuthors={setCurrentAuthors}
+                currentInstances={currentInstances}
+                setCurrentInstances={setCurrentInstances}
               />
             )}
           </Tab.Screen>
@@ -325,8 +377,12 @@ export default function App() {
                 credentials={credentials}
                 setCredentials={setCredentials}
                 updateCredentials={updateCredentials}
-                currentPreferences={currentPreferences}
-                setCurrentPreferences={setCurrentPreferences}
+                currentTopics={currentTopics}
+                setCurrentTopics={setCurrentTopics}
+                currentAuthors={currentAuthors}
+                setCurrentAuthors={setCurrentAuthors}
+                currentInstances={currentInstances}
+                setCurrentInstances={setCurrentInstances}
               />
             )}
           </Tab.Screen>

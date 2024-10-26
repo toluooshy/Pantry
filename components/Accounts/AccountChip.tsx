@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import axios from "axios";
-import { Text, View } from "react-native";
+import { Text, View, ScrollView } from "react-native";
 
 import { PostObject } from "../../types";
 
@@ -9,9 +9,10 @@ import FastImage from "react-native-fast-image";
 type Props = {
   server: string;
   id: string;
+  width: number;
 };
 
-const AccountChip = ({ server, id }: Props) => {
+const AccountChip = ({ server, id, width }: Props) => {
   const [isDeleted, setIsDeleted] = useState<boolean>(false);
   const [author, setAuthor] = useState<any>(null);
 
@@ -49,11 +50,17 @@ const AccountChip = ({ server, id }: Props) => {
             }}
           />
           <View>
-            <View style={{ display: "flex", flexDirection: "row" }}>
+            <ScrollView
+              style={{
+                display: "flex",
+                flexDirection: "row",
+                maxWidth: width - 100,
+              }}
+            >
               <View>
                 <Text>{author?.handle}</Text>
               </View>
-            </View>
+            </ScrollView>
           </View>
         </View>
       ) : null}

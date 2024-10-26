@@ -1,14 +1,22 @@
 import { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 
-import { Text, Dimensions, RefreshControl, ScrollView } from "react-native";
+import {
+  Text,
+  Dimensions,
+  RefreshControl,
+  ScrollView,
+  View,
+} from "react-native";
 
 import Post from "../components/Posts/Post";
 import {
-  ArchiveObject,
   Credentials,
   PostObject,
-  PreferencesObject,
+  ArchiveObject,
+  TopicsObject,
+  AuthorsObject,
+  InstancesObject,
 } from "../types";
 
 type Props = {
@@ -18,8 +26,13 @@ type Props = {
   updateCredentials: (data: Credentials) => void;
   currentArchive: ArchiveObject;
   setCurrentArchive: (data: ArchiveObject) => void;
-  currentPreferences: PreferencesObject;
-  setCurrentPreferences: (data: PreferencesObject) => void;
+  currentTopics: TopicsObject;
+  setCurrentTopics: (data: TopicsObject) => void;
+  currentAuthors: AuthorsObject;
+  setCurrentAuthors: (data: AuthorsObject) => void;
+  currentInstances: InstancesObject;
+  setCurrentInstances: (data: InstancesObject) => void;
+  homeRefreshTimestamp: number;
 };
 
 const Home = ({
@@ -29,24 +42,20 @@ const Home = ({
   updateCredentials,
   currentArchive,
   setCurrentArchive,
-  currentPreferences,
-  setCurrentPreferences,
+  currentTopics,
+  setCurrentTopics,
+  currentAuthors,
+  setCurrentAuthors,
+  currentInstances,
+  setCurrentInstances,
+  homeRefreshTimestamp,
 }: Props) => {
   const [loaded, setLoaded] = useState<boolean>(false);
   const [pantry, setPantry] = useState([] as PostObject[]);
   const [postIds, setPostIds] = useState({} as any);
   const [uniquePosts, setUniquePosts] = useState({} as any);
 
-  useEffect(() => {
-    if (!!currentPreferences) {
-      getMastodonPosts(
-        Object.keys(currentPreferences.instances),
-        Object.keys(currentPreferences.topics)
-      );
-    }
-  }, []);
-
-  const getMastodonPosts = async (instances: string[], tags: string[]) => {
+  const getMastodonPosts = async () => {
     setPantry([]);
     setLoaded(false);
 
@@ -54,7 +63,7 @@ const Home = ({
     let newPostIds: Record<string, boolean> = {};
     let newUniquePosts: Record<string, string> = {};
 
-    const fetchPosts = async (url: string, instance: string, limit: number) => {
+    const fetchPosts = async (url: string, limit: number) => {
       try {
         const res = await axios.get(url, { params: { limit: limit } });
         if (res.data) {
@@ -113,36 +122,27 @@ const Home = ({
     };
 
     // Fetch from instances and tags concurrently
-    const instancePromises = instances.map(async (instance) => {
-      await fetchPosts(
-        `https://${instance}/api/v1/trends/statuses`,
-        instance,
-        10
-      );
-      const tagPromises = tags.map((tag) =>
-        fetchPosts(
-          `https://${instance}/api/v1/timelines/tag/${tag}`,
-          instance,
-          10
-        )
-      );
-      await Promise.allSettled(tagPromises);
-    });
+    const instancePromises = Object.keys(currentInstances).map(
+      async (instance) => {
+        await fetchPosts(`https://${instance}/api/v1/trends/statuses`, 20);
+        const tagPromises = Object.keys(currentTopics).map((tag) =>
+          fetchPosts(`https://${instance}/api/v1/timelines/tag/${tag}`, 10)
+        );
+        await Promise.allSettled(tagPromises);
+      }
+    );
 
     await Promise.allSettled(instancePromises);
 
     // Fetch posts from specific authors
-    const authorPromises = Object.keys(currentPreferences.authors).map(
-      async (account) => {
-        const instance = account.split(":")[1];
-        const accountId = account.split(":")[2];
-        await fetchPosts(
-          `https://${instance}/api/v1/accounts/${accountId}/statuses`,
-          instance,
-          10
-        );
-      }
-    );
+    const authorPromises = Object.keys(currentAuthors).map(async (account) => {
+      const instance = account.split(":")[1];
+      const accountId = account.split(":")[2];
+      await fetchPosts(
+        `https://${instance}/api/v1/accounts/${accountId}/statuses`,
+        15
+      );
+    });
 
     await Promise.allSettled(authorPromises);
 
@@ -156,15 +156,20 @@ const Home = ({
 
   const [refreshing, setRefreshing] = useState<boolean>(false);
 
+  useEffect(() => {
+    getMastodonPosts();
+  }, []);
+
+  useEffect(() => {
+    onRefresh();
+  }, [homeRefreshTimestamp]);
+
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
-    await getMastodonPosts(
-      Object.keys(currentPreferences.instances),
-      Object.keys(currentPreferences.topics)
-    );
+    await getMastodonPosts();
 
     setRefreshing(false);
-  }, []);
+  }, [currentAuthors, currentTopics, currentInstances]);
 
   return !!credentials ? (
     <ScrollView
@@ -184,6 +189,7 @@ const Home = ({
         />
       }
     >
+      <View style={{ height: 10 }} />
       {loaded
         ? pantry.map((post, index) => (
             <Post
@@ -193,8 +199,12 @@ const Home = ({
               updateCredentials={updateCredentials}
               currentArchive={currentArchive}
               setCurrentArchive={setCurrentArchive}
-              currentPreferences={currentPreferences}
-              setCurrentPreferences={setCurrentPreferences}
+              currentTopics={currentTopics}
+              setCurrentTopics={setCurrentTopics}
+              currentAuthors={currentAuthors}
+              setCurrentAuthors={setCurrentAuthors}
+              currentInstances={currentInstances}
+              setCurrentInstances={setCurrentInstances}
               data={post}
               archived={false}
             />

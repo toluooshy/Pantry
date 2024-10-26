@@ -1,7 +1,9 @@
 export type Credentials = {
-  [key: string]: PreferencesObject | ArchiveObject;
-  preferences: PreferencesObject;
+  [key: string]: ArchiveObject | TopicsObject | AuthorsObject | InstancesObject;
   archive: ArchiveObject;
+  topics: TopicsObject;
+  authors: AuthorsObject;
+  instances: InstancesObject;
 };
 
 export type PostObject = {
@@ -21,13 +23,6 @@ export type PostObject = {
   likes: number;
   url: string;
   heatindex: number;
-};
-
-export type PreferencesObject = {
-  [key: string]: TopicsObject | AuthorsObject | InstancesObject;
-  topics: TopicsObject;
-  authors: AuthorsObject;
-  instances: InstancesObject;
 };
 
 export type ArchiveObject = {

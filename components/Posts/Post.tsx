@@ -16,7 +16,6 @@ import LinearGradient from "react-native-linear-gradient";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import ReanimatedSwipeable from "react-native-gesture-handler/ReanimatedSwipeable";
 import Reanimated, {
-  AnimateStyle,
   SharedValue,
   useAnimatedStyle,
 } from "react-native-reanimated";
@@ -27,10 +26,12 @@ import nlp from "compromise";
 import { htmlToText } from "html-to-text";
 
 import {
-  ArchiveObject,
   Credentials,
   PostObject,
-  PreferencesObject,
+  ArchiveObject,
+  TopicsObject,
+  AuthorsObject,
+  InstancesObject,
 } from "../../types";
 
 import PlusIcon from "../../assets/icons/plus.svg";
@@ -44,8 +45,12 @@ type Props = {
   updateCredentials: (data: Credentials) => void;
   currentArchive: ArchiveObject;
   setCurrentArchive: (data: ArchiveObject) => void;
-  currentPreferences: PreferencesObject;
-  setCurrentPreferences: (data: PreferencesObject) => void;
+  currentTopics: TopicsObject;
+  setCurrentTopics: (data: TopicsObject) => void;
+  currentAuthors: AuthorsObject;
+  setCurrentAuthors: (data: AuthorsObject) => void;
+  currentInstances: InstancesObject;
+  setCurrentInstances: (data: InstancesObject) => void;
   data: PostObject;
   archived: boolean;
 };
@@ -187,8 +192,12 @@ const Post = ({
   updateCredentials,
   currentArchive,
   setCurrentArchive,
-  currentPreferences,
-  setCurrentPreferences,
+  currentTopics,
+  setCurrentTopics,
+  currentAuthors,
+  setCurrentAuthors,
+  currentInstances,
+  setCurrentInstances,
   data,
   archived = false,
 }: Props) => {
@@ -284,18 +293,24 @@ const Post = ({
   ) => {
     const tempCredentials = credentials;
     if (
-      Object.keys(tempCredentials.preferences[preference]).indexOf(item) !== -1
+      preference === "topics" ||
+      preference === "authors" ||
+      preference === "instances"
     ) {
-      tempCredentials.preferences[preference][item] += incrementing ? 1 : -1;
-    } else {
-      tempCredentials.preferences[preference] = {
-        ...tempCredentials?.preferences?.[preference],
-        [item]: incrementing ? 1 : -1,
-      };
+      if (Object.keys(tempCredentials[preference]).indexOf(item) !== -1) {
+        tempCredentials[preference][item] += incrementing ? 1 : -1;
+      } else {
+        tempCredentials[preference] = {
+          ...tempCredentials?.[preference],
+          [item]: incrementing ? 1 : -1,
+        };
+      }
     }
     setCredentials(tempCredentials);
     updateCredentials(tempCredentials);
-    setCurrentPreferences(tempCredentials.preferences);
+    setCurrentTopics(tempCredentials.topics);
+    setCurrentAuthors(tempCredentials.authors);
+    setCurrentInstances(tempCredentials.instances);
   };
 
   const updateArchive = (adding: boolean) => {
@@ -324,7 +339,9 @@ const Post = ({
               delete tempCredentials["archive"][data.id];
               setCredentials(tempCredentials);
               updateCredentials(tempCredentials);
-              setCurrentPreferences(tempCredentials.preferences);
+              setCurrentTopics(tempCredentials.topics);
+              setCurrentAuthors(tempCredentials.authors);
+              setCurrentInstances(tempCredentials.instances);
               setIsDeleted(true);
             },
             style: "destructive",
@@ -473,7 +490,8 @@ const Post = ({
             <GestureHandlerRootView>
               <View
                 style={{
-                  marginBottom: 10,
+                  marginBottom: 20,
+                  marginTop: -10,
                   elevation: 4,
                   borderRadius: 8,
                   backgroundColor: "#ffffff",
@@ -497,11 +515,10 @@ const Post = ({
                   <LongPressGestureHandler
                     onHandlerStateChange={({ nativeEvent }) => {
                       if (nativeEvent.state === 4) {
-                        // 5 represents the END state
                         setCurationMode(true);
                       }
                     }}
-                    minDurationMs={250} // Optional: Set the minimum duration for the long press
+                    minDurationMs={250}
                   >
                     <View
                       style={{
@@ -839,142 +856,6 @@ const Post = ({
                       </TouchableWithoutFeedback>
                     ))}
                   </View>
-                  {/* 
-              <TouchableWithoutFeedback>
-                <View
-                  style={{
-                    display: "flex",
-                    flexDirection: "row",
-                    justifyContent: "space-between",
-                    backgroundColor: "#ffffff",
-                    padding: 10,
-                    borderRadius: 8,
-                    marginBottom: 10,
-                  }}
-                >
-                  <View
-                    style={{
-                      display: "flex",
-                      flex: 1,
-                      flexDirection: "row",
-                      justifyContent: "space-between",
-                    }}
-                  >
-                    <TouchableOpacity
-                      style={{
-                        justifyContent: "center",
-                      }}
-                    >
-                      <MinusIcon />
-                    </TouchableOpacity>
-                    <View
-                      style={{
-                        display: "flex",
-                        flex: 1,
-                        flexDirection: "row",
-                        marginLeft: 10,
-                        marginRight: 10,
-                      }}
-                    >
-                      <View>
-                        <HTMLView value={data.body} />
-                        {keywords && (
-                          <View>
-                            {keywords.map((keyword: string, index: number) => (
-                              <Text key={index} style={{ color: "#000000" }}>
-                                {keyword}
-                              </Text>
-                            ))}
-                          </View>
-                        )}
-                      </View>
-                    </View>
-
-                    <TouchableOpacity
-                      style={{
-                        justifyContent: "center",
-                      }}
-                    >
-                      <PlusIcon />
-                    </TouchableOpacity>
-                  </View>
-                </View>
-              </TouchableWithoutFeedback> */}
-
-                  {/* Images */}
-                  {/* {data.images?.length > 0 ? (
-                    <View>
-                      <TouchableWithoutFeedback>
-                        <View
-                          style={{
-                            display: "flex",
-                            flexDirection: "row",
-                            justifyContent: "space-between",
-                            backgroundColor: "#ffffff",
-                            padding: 10,
-                            borderRadius: 8,
-                            marginBottom: 10,
-                          }}
-                        >
-                          <View
-                            style={{
-                              display: "flex",
-                              flex: 1,
-                              flexDirection: "row",
-                              justifyContent: "space-between",
-                            }}
-                          >
-                            <TouchableOpacity
-                              style={{
-                                justifyContent: "center",
-                              }}
-                            >
-                              <MinusIcon />
-                            </TouchableOpacity>
-                            <View
-                              style={{
-                                display: "flex",
-                                flex: 1,
-                                flexDirection: "row",
-                                marginLeft: 10,
-                                marginRight: 10,
-                              }}
-                            >
-                              <ScrollView horizontal={true}>
-                                {data.images?.map((image, index) => (
-                                  <FastImage
-                                    key={index}
-                                    style={{
-                                      width: width - 128,
-                                      height: 150,
-                                      borderRadius: 8,
-                                      marginTop: 10,
-                                      marginRight:
-                                        data.images.length > 1 &&
-                                        index !== data.images.length - 1
-                                          ? 10
-                                          : 0,
-                                    }}
-                                    resizeMode={FastImage.resizeMode.cover}
-                                    source={{
-                                      uri: image,
-                                    }}
-                                  />
-                                ))}
-                              </ScrollView>
-                            </View>
-                            <TouchableOpacity
-                              style={{
-                                justifyContent: "center",
-                              }}
-                            >
-                              <PlusIcon />
-                            </TouchableOpacity>
-                          </View>
-                        </View>
-                      </TouchableWithoutFeedback>
-                    </View>
-                  ) : null} */}
 
                   {/* Hashtags */}
                   <View

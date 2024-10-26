@@ -12,10 +12,12 @@ import {
 
 import Post from "../components/Posts/Post";
 import {
-  ArchiveObject,
   Credentials,
   PostObject,
-  PreferencesObject,
+  ArchiveObject,
+  TopicsObject,
+  AuthorsObject,
+  InstancesObject,
 } from "../types";
 
 type Props = {
@@ -25,8 +27,12 @@ type Props = {
   updateCredentials: (data: Credentials) => void;
   currentArchive: ArchiveObject;
   setCurrentArchive: (data: ArchiveObject) => void;
-  currentPreferences: PreferencesObject;
-  setCurrentPreferences: (data: PreferencesObject) => void;
+  currentTopics: TopicsObject;
+  setCurrentTopics: (data: TopicsObject) => void;
+  currentAuthors: AuthorsObject;
+  setCurrentAuthors: (data: AuthorsObject) => void;
+  currentInstances: InstancesObject;
+  setCurrentInstances: (data: InstancesObject) => void;
 };
 
 const Archive = ({
@@ -36,22 +42,27 @@ const Archive = ({
   updateCredentials,
   currentArchive,
   setCurrentArchive,
-  currentPreferences,
-  setCurrentPreferences,
+  currentTopics,
+  setCurrentTopics,
+  currentAuthors,
+  setCurrentAuthors,
+  currentInstances,
+  setCurrentInstances,
 }: Props) => {
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        showsHorizontalScrollIndicator={false}
-        style={{
-          flex: 1,
-          padding: 10,
-          backgroundColor: "#FEF6F7", // "rgba(255,145,104,.25)",
-        }}
-      >
-        {!!Object.keys(currentArchive).length ? (
-          Object.keys(currentArchive).map((postId: string, index) => (
+      {!!Object.keys(currentArchive).length ? (
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          showsHorizontalScrollIndicator={false}
+          style={{
+            flex: 1,
+            padding: 10,
+            backgroundColor: "#FEF6F7",
+          }}
+        >
+          <View style={{ height: 10 }} />
+          {Object.keys(currentArchive).map((postId: string, index) => (
             <Post
               key={index}
               archived={true}
@@ -60,15 +71,30 @@ const Archive = ({
               updateCredentials={updateCredentials}
               currentArchive={currentArchive}
               setCurrentArchive={setCurrentArchive}
-              currentPreferences={currentPreferences}
-              setCurrentPreferences={setCurrentPreferences}
+              currentTopics={currentTopics}
+              setCurrentTopics={setCurrentTopics}
+              currentAuthors={currentAuthors}
+              setCurrentAuthors={setCurrentAuthors}
+              currentInstances={currentInstances}
+              setCurrentInstances={setCurrentInstances}
               data={credentials.archive[postId] as PostObject}
             />
-          ))
-        ) : (
-          <Text>Nothing archived yet.</Text>
-        )}
-      </ScrollView>
+          ))}
+        </ScrollView>
+      ) : (
+        <View
+          style={{
+            flex: 1,
+            justifyContent: "center",
+            alignContent: "center",
+            backgroundColor: "#FEF6F7",
+          }}
+        >
+          <Text style={{ textAlign: "center", color: "#888888" }}>
+            Archive posts from your feed here!
+          </Text>
+        </View>
+      )}
     </TouchableWithoutFeedback>
   );
 };

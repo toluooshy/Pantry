@@ -54,7 +54,7 @@ const SearchBar = ({
 
     debounceTimeout.current = setTimeout(() => {
       searchQuery(query);
-    }, 50);
+    }, 10);
 
     return () => {
       if (debounceTimeout.current) {
@@ -83,14 +83,14 @@ const SearchBar = ({
           style={{
             borderRadius: 8,
             borderWidth: 1,
-            borderColor: "#98a2b3",
+            borderColor: "#888888",
             marginTop: 5,
             marginBottom: 2,
             paddingTop: Platform.OS === "ios" ? 10 : 5,
             paddingBottom: Platform.OS === "ios" ? 10 : 5,
             paddingLeft: 36,
             paddingRight: 10,
-            backgroundColor: "#f9fafb",
+            backgroundColor: "#FEF6F7",
           }}
           maxLength={36}
           autoCapitalize="none"

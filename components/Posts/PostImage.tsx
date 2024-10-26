@@ -1,11 +1,10 @@
 "use es6";
 
-import React, { useState, useRef } from "react";
-import { Text, View, TouchableOpacity, Pressable } from "react-native";
+import React, { useState } from "react";
+import { View, TouchableOpacity, Pressable } from "react-native";
 import FastImage from "react-native-fast-image";
-import Video, { VideoRef } from "react-native-video";
+import Video from "react-native-video";
 
-import { Credentials } from "../../types";
 import PostImageModal from "../../modals/PostImageModal";
 
 import PlayIcon from "../../assets/icons/play.svg";
@@ -44,9 +43,7 @@ const PostImage = ({
 
   const handleBuffer = async () => {};
 
-  const handleError = async () => {
-    console.log("error playing video");
-  };
+  const handleError = async () => {};
 
   return (
     <View>

@@ -14,10 +14,12 @@ import {
 
 import Post from "../components/Posts/Post";
 import {
-  ArchiveObject,
   Credentials,
   PostObject,
-  PreferencesObject,
+  ArchiveObject,
+  TopicsObject,
+  AuthorsObject,
+  InstancesObject,
 } from "../types";
 import SearchBar from "@/components/Search/SearchBar";
 import AccountCard from "@/components/Accounts/AccountCard";
@@ -29,8 +31,12 @@ type Props = {
   updateCredentials: (data: Credentials) => void;
   currentArchive: ArchiveObject;
   setCurrentArchive: (data: ArchiveObject) => void;
-  currentPreferences: PreferencesObject;
-  setCurrentPreferences: (data: PreferencesObject) => void;
+  currentTopics: TopicsObject;
+  setCurrentTopics: (data: TopicsObject) => void;
+  currentAuthors: AuthorsObject;
+  setCurrentAuthors: (data: AuthorsObject) => void;
+  currentInstances: InstancesObject;
+  setCurrentInstances: (data: InstancesObject) => void;
 };
 
 const Explore = ({
@@ -40,8 +46,12 @@ const Explore = ({
   updateCredentials,
   currentArchive,
   setCurrentArchive,
-  currentPreferences,
-  setCurrentPreferences,
+  currentTopics,
+  setCurrentTopics,
+  currentAuthors,
+  setCurrentAuthors,
+  currentInstances,
+  setCurrentInstances,
 }: Props) => {
   const [currentQuery, setCurrentQuery] = useState<string>("");
   const [searchResults, setSearchResults] = useState<any>({
@@ -51,11 +61,12 @@ const Explore = ({
   });
   const [resultType, setResultType] = useState<string>("accounts");
 
-  const searchMastodon = (instances: string[], query: string) => {};
-
-  useEffect(() => {
-    searchMastodon(Object.keys(currentPreferences.instances), currentQuery);
-  }, [currentQuery]);
+  const truncatedText = (text: string, max: number) => {
+    if (text.length > max) {
+      return text.slice(0, max - 3) + "...";
+    }
+    return text;
+  };
 
   return (
     <View
@@ -126,8 +137,12 @@ const Explore = ({
                     updateCredentials={updateCredentials}
                     currentArchive={currentArchive}
                     setCurrentArchive={setCurrentArchive}
-                    currentPreferences={currentPreferences}
-                    setCurrentPreferences={setCurrentPreferences}
+                    currentTopics={currentTopics}
+                    setCurrentTopics={setCurrentTopics}
+                    currentAuthors={currentAuthors}
+                    setCurrentAuthors={setCurrentAuthors}
+                    currentInstances={currentInstances}
+                    setCurrentInstances={setCurrentInstances}
                   />
                 ) : (
                   <View
@@ -152,7 +167,11 @@ const Explore = ({
                           fontSize: 18,
                         }}
                       >
-                        #{result.name}
+                        #
+                        {truncatedText(
+                          result.name + "12345678901234567890",
+                          36
+                        )}
                       </Text>
                     </Pressable>
                   </View>
