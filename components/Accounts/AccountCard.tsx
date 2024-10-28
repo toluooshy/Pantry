@@ -1,11 +1,8 @@
 import React, { useState } from "react";
-import { Pressable, Text, View } from "react-native";
-
-import FastImage from "react-native-fast-image";
+import { Pressable, Text, View, Image } from "react-native";
 
 import {
   Credentials,
-  PostObject,
   ArchiveObject,
   TopicsObject,
   AuthorsObject,
@@ -101,7 +98,7 @@ const AccountCard = ({
         borderBottomColor: "#cccccc",
       }}
     >
-      <FastImage
+      <Image
         style={{
           width: 48,
           height: 48,
@@ -110,7 +107,7 @@ const AccountCard = ({
           borderWidth: 0.5,
           borderColor: "#aaaaaa",
         }}
-        resizeMode={FastImage.resizeMode.cover}
+        resizeMode={"cover"}
         source={{
           uri: data.avatar,
         }}

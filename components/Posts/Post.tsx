@@ -10,11 +10,12 @@ import {
   Dimensions,
   ScrollView,
   Share,
+  Image,
 } from "react-native";
 
-import LinearGradient from "react-native-linear-gradient";
+import { LinearGradient } from "expo-linear-gradient";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-import ReanimatedSwipeable from "react-native-gesture-handler/ReanimatedSwipeable";
+import Swipeable from "react-native-gesture-handler/ReanimatedSwipeable";
 import Reanimated, {
   SharedValue,
   useAnimatedStyle,
@@ -36,7 +37,6 @@ import {
 
 import PlusIcon from "../../assets/icons/plus.svg";
 import MinusIcon from "../../assets/icons/minus.svg";
-import FastImage from "react-native-fast-image";
 import PostImage from "./PostImage";
 
 type Props = {
@@ -355,46 +355,46 @@ const Post = ({
     }
   };
 
-  const LeftAction = (prog: SharedValue<number>, drag: SharedValue<number>) => {
-    const styleAnimation = useAnimatedStyle(() => {
-      return {
-        transform: [{ translateX: drag.value - 100 }],
-      };
-    });
+  // const LeftAction = (prog: SharedValue<number>, drag: SharedValue<number>) => {
+  //   const styleAnimation = useAnimatedStyle(() => {
+  //     return {
+  //       transform: [{ translateX: drag.value - 100 }],
+  //     };
+  //   });
 
-    return (
-      <Reanimated.View style={styleAnimation}>
-        <TouchableOpacity
-          onPress={() => {
-            updateArchive(archived ? false : true);
-            if (swipeableRef.current) {
-              swipeableRef.current.close();
-            }
-          }}
-        >
-          <View
-            style={{
-              display: "flex",
-              width: 100,
-              height: "100%",
-              justifyContent: "center",
-              backgroundColor: archived ? "#FF3B30" : "#34C759",
-            }}
-          >
-            <Text
-              style={{
-                fontWeight: 600,
-                textAlign: "center",
-                color: "#ffffff",
-              }}
-            >
-              {archived ? "Remove" : "Archive"}
-            </Text>
-          </View>
-        </TouchableOpacity>
-      </Reanimated.View>
-    );
-  };
+  //   return (
+  //     <Reanimated.View style={styleAnimation}>
+  //       <TouchableOpacity
+  //         onPress={() => {
+  //           updateArchive(archived ? false : true);
+  //           if (swipeableRef.current) {
+  //             swipeableRef.current.close();
+  //           }
+  //         }}
+  //       >
+  //         <View
+  //           style={{
+  //             display: "flex",
+  //             width: 100,
+  //             height: "100%",
+  //             justifyContent: "center",
+  //             backgroundColor: archived ? "#FF3B30" : "#34C759",
+  //           }}
+  //         >
+  //           <Text
+  //             style={{
+  //               fontWeight: 600,
+  //               textAlign: "center",
+  //               color: "#ffffff",
+  //             }}
+  //           >
+  //             {archived ? "Remove" : "Archive"}
+  //           </Text>
+  //         </View>
+  //       </TouchableOpacity>
+  //     </Reanimated.View>
+  //   );
+  // };
 
   const RightAction = (
     prog: SharedValue<number>,
@@ -501,13 +501,13 @@ const Post = ({
                   shadowRadius: 3.84,
                 }}
               >
-                <ReanimatedSwipeable
+                <Swipeable
                   ref={swipeableRef}
                   friction={1}
                   enableTrackpadTwoFingerGesture
                   leftThreshold={10}
                   rightThreshold={0}
-                  renderLeftActions={LeftAction}
+                  // renderLeftActions={LeftAction}
                   renderRightActions={RightAction}
                   overshootLeft={false}
                   overshootRight={false}
@@ -537,7 +537,7 @@ const Post = ({
                         }}
                       >
                         <View style={{ display: "flex", flexDirection: "row" }}>
-                          <FastImage
+                          <Image
                             style={{
                               width: 36,
                               height: 36,
@@ -546,7 +546,7 @@ const Post = ({
                               borderWidth: 0.5,
                               borderColor: "#aaaaaa",
                             }}
-                            resizeMode={FastImage.resizeMode.cover}
+                            resizeMode={"cover"}
                             source={{
                               uri: author?.avatar,
                             }}
@@ -567,12 +567,12 @@ const Post = ({
                           </View>
                         </View>
                         <View>
-                          <FastImage
+                          <Image
                             style={{
                               width: 16,
                               height: 16,
                             }}
-                            resizeMode={FastImage.resizeMode.cover}
+                            resizeMode={"cover"}
                             source={{
                               uri:
                                 data.source === "mastodon"
@@ -649,7 +649,7 @@ const Post = ({
                       </View>
                     </View>
                   </LongPressGestureHandler>
-                </ReanimatedSwipeable>
+                </Swipeable>
               </View>
             </GestureHandlerRootView>
           ) : (
@@ -736,7 +736,7 @@ const Post = ({
                           <View
                             style={{ display: "flex", flexDirection: "row" }}
                           >
-                            <FastImage
+                            <Image
                               style={{
                                 width: 36,
                                 height: 36,
@@ -745,7 +745,7 @@ const Post = ({
                                 borderWidth: 0.5,
                                 borderColor: "#aaaaaa",
                               }}
-                              resizeMode={FastImage.resizeMode.cover}
+                              resizeMode={"cover"}
                               source={{
                                 uri: author?.avatar,
                               }}

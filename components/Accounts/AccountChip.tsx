@@ -1,10 +1,6 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { Text, View, ScrollView } from "react-native";
-
-import { PostObject } from "../../types";
-
-import FastImage from "react-native-fast-image";
+import { Text, View, ScrollView, Image } from "react-native";
 
 type Props = {
   server: string;
@@ -35,7 +31,7 @@ const AccountChip = ({ server, id, width }: Props) => {
     <View>
       {!!author ? (
         <View style={{ display: "flex", flexDirection: "row" }}>
-          <FastImage
+          <Image
             style={{
               width: 24,
               height: 24,
@@ -44,7 +40,7 @@ const AccountChip = ({ server, id, width }: Props) => {
               borderWidth: 0.5,
               borderColor: "#aaaaaa",
             }}
-            resizeMode={FastImage.resizeMode.cover}
+            resizeMode={"cover"}
             source={{
               uri: author?.avatar,
             }}

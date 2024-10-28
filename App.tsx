@@ -8,16 +8,17 @@ import {
   SafeAreaView,
   Platform,
   Pressable,
+  Image,
 } from "react-native";
-import FastImage from "react-native-fast-image";
 
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { NavigationContainer } from "@react-navigation/native";
-import EncryptedStorage from "react-native-encrypted-storage";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
-import LinearGradient from "react-native-linear-gradient";
+import { LinearGradient } from "expo-linear-gradient";
 
 import Home from "./screens/Home";
+import Explore from "./screens/Explore";
 import Archive from "./screens/Archive";
 import Settings from "./screens/Settings";
 
@@ -33,7 +34,6 @@ import {
   AuthorsObject,
   InstancesObject,
 } from "./types";
-import Explore from "./screens/Explore";
 
 const Tab = createBottomTabNavigator();
 export default function App() {
@@ -70,7 +70,7 @@ export default function App() {
 
   const getCredentials = async () => {
     try {
-      const data = await EncryptedStorage.getItem("pantry-credentials");
+      const data = await AsyncStorage.getItem("pantry-credentials");
       if (!!data) {
         const tempCredentials = JSON.parse(data);
         setCredentials(tempCredentials);
@@ -103,10 +103,7 @@ export default function App() {
 
   const updateCredentials = async (data: Credentials) => {
     try {
-      await EncryptedStorage.setItem(
-        "pantry-credentials",
-        JSON.stringify(data)
-      );
+      await AsyncStorage.setItem("pantry-credentials", JSON.stringify(data));
     } catch (error) {
       console.log(error);
     }
@@ -114,7 +111,7 @@ export default function App() {
 
   const clearCredentials = async () => {
     try {
-      await EncryptedStorage.clear();
+      await AsyncStorage.clear();
     } catch (error) {
       console.log(error);
     }
@@ -182,7 +179,7 @@ export default function App() {
                       borderBottomWidth: 0.2,
                     }}
                   >
-                    <FastImage
+                    <Image
                       style={{ width: 128, height: 28 }}
                       source={require("./assets/branding/wordmarkcolorful.png")}
                     />

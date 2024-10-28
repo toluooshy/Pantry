@@ -1,13 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 
-import {
-  Text,
-  Dimensions,
-  RefreshControl,
-  ScrollView,
-  View,
-} from "react-native";
+import { RefreshControl, ScrollView, View } from "react-native";
 
 import Post from "../components/Posts/Post";
 import {

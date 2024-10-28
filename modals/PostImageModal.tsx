@@ -7,13 +7,23 @@ import {
   TouchableWithoutFeedback,
   Keyboard,
   SafeAreaView,
+  Image,
 } from "react-native";
-import FastImage from "react-native-fast-image";
+
+import {
+  PinchGestureHandler,
+  GestureHandlerRootView,
+} from "react-native-gesture-handler";
+import Animated, {
+  useAnimatedGestureHandler,
+  useAnimatedStyle,
+  useSharedValue,
+} from "react-native-reanimated";
 
 import Modal from "react-native-modal";
 
 import XmarkWhiteIcon from "../assets/icons/xmarkwhite.svg";
-import Video, { VideoRef } from "react-native-video";
+import { Video, Audio, ResizeMode } from "expo-av";
 
 type Props = {
   postImageModalVisible: boolean;
@@ -40,23 +50,36 @@ const PostImageModal = ({
 }: Props) => {
   const width = Dimensions.get("screen").width;
   const height = Dimensions.get("screen").height;
-  const videoRef = useRef<VideoRef>(null);
-  const [sourceWidth, setSourceWidth] = useState<number>(0);
-  const [sourceHeight, setSourceHeight] = useState<number>(0);
-  const [progress, setProgress] = useState<number>(0);
-  const [duration, setDuration] = useState<number>(0);
+  const videoRef = useRef<any>(null);
+  const [videoDimensions, setVideoDimensions] = useState<any>({
+    width: 0,
+    height: 0,
+  });
 
-  const onLoad = (data: any) => {
-    setDuration(data.duration);
-    setSourceWidth(data.naturalSize.width);
-    setSourceHeight(data.naturalSize.height);
-  };
+  const scale = useSharedValue(1);
 
-  const onEnd = () => {
-    videoRef.current?.seek(0);
-    setProgress(0);
-    togglePlay();
-  };
+  const pinchGestureHandler = useAnimatedGestureHandler({
+    onActive: (event: any) => {
+      scale.value = event.scale;
+    },
+    onEnd: () => {
+      scale.value = 1;
+    },
+  });
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: scale.value }],
+  }));
+
+  useEffect(() => {
+    const setupAudio = async () => {
+      await Audio.setAudioModeAsync({
+        playsInSilentModeIOS: true,
+      });
+    };
+
+    setupAudio();
+  }, []);
 
   useEffect(() => {
     togglePlay();
@@ -113,43 +136,61 @@ const PostImageModal = ({
               }}
             >
               {isVideo ? (
-                <View>
-                  <Video
-                    source={{ uri: uri }}
-                    ref={videoRef}
-                    onBuffer={handleBuffer}
-                    onError={handleError}
-                    paused={!isPlaying}
-                    resizeMode="cover"
-                    onLoad={onLoad}
-                    onEnd={onEnd}
-                    controls={true}
-                    style={{
-                      width: width - 20,
-                      height:
-                        !!sourceWidth && !!sourceHeight
-                          ? sourceHeight * ((width - 20) / sourceWidth)
-                          : 0,
-                      maxHeight: height - 200,
-                      marginBottom: 30,
-                    }}
-                  />
-                </View>
-              ) : (
-                <FastImage
+                <Video
+                  source={{ uri: uri }}
+                  ref={videoRef}
+                  onReadyForDisplay={({ naturalSize: { width, height } }) => {
+                    setVideoDimensions({
+                      width,
+                      height,
+                    });
+                  }}
+                  onError={handleError}
+                  shouldPlay={true}
+                  resizeMode={ResizeMode.STRETCH}
+                  useNativeControls={true}
                   style={{
-                    width: "100%",
-                    aspectRatio: 1,
-                    margin: 10,
-                    marginTop: -65,
+                    width: width - 20,
+                    height:
+                      !!videoDimensions.width && !!videoDimensions.height
+                        ? videoDimensions.height *
+                          ((width - 20) / videoDimensions.width)
+                        : 0,
+                    maxHeight: height - 200,
+                    marginBottom: 30,
                   }}
-                  resizeMode={FastImage.resizeMode.contain}
-                  source={{
-                    uri:
-                      uri ||
-                      "https://wuvu-defaults.s3.amazonaws.com/blankimage.png",
-                  }}
+                  isLooping={true}
                 />
+              ) : (
+                <GestureHandlerRootView style={{ flex: 1 }}>
+                  <PinchGestureHandler onGestureEvent={pinchGestureHandler}>
+                    <Animated.View
+                      style={{
+                        flex: 1,
+                        justifyContent: "center",
+                        alignItems: "center",
+                      }}
+                    >
+                      <Animated.Image
+                        source={{
+                          uri:
+                            uri ||
+                            "https://wuvu-defaults.s3.amazonaws.com/blankimage.png",
+                        }}
+                        style={[
+                          {
+                            width: "100%",
+                            aspectRatio: 1,
+                            margin: 10,
+                            marginTop: -65,
+                          },
+                          animatedStyle,
+                        ]}
+                        resizeMode="contain"
+                      />
+                    </Animated.View>
+                  </PinchGestureHandler>
+                </GestureHandlerRootView>
               )}
             </View>
           </Pressable>

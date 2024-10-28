@@ -1,21 +1,17 @@
-import { useState, useEffect } from "react";
-import axios from "axios";
+import { useState } from "react";
 
 import {
   View,
   Text,
-  Button,
   Keyboard,
   TouchableWithoutFeedback,
   ScrollView,
-  TouchableOpacity,
   Pressable,
 } from "react-native";
 
 import Post from "../components/Posts/Post";
 import {
   Credentials,
-  PostObject,
   ArchiveObject,
   TopicsObject,
   AuthorsObject,

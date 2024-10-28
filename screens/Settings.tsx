@@ -18,7 +18,7 @@ import {
   InstancesObject,
 } from "../types";
 
-import DocumentPicker from "react-native-document-picker";
+import * as DocumentPicker from "expo-document-picker";
 import Papa from "papaparse";
 import PostAuthor from "@/components/Accounts/AccountChip";
 
@@ -87,42 +87,41 @@ const Settings = ({
 
   const handleFileSelect = async () => {
     try {
-      const res = await DocumentPicker.pick({
-        type: [DocumentPicker.types.allFiles], // Specify allowed file types
-      });
+      const res = (await DocumentPicker.getDocumentAsync({
+        type: "*/*",
+        copyToCacheDirectory: false,
+      })) as any;
 
-      const response = await fetch(res[0].uri);
-      const csvText = await response.text();
+      if (res.type === "success") {
+        const response = await fetch(res.uri);
+        const csvText = await response.text();
 
-      Papa.parse(csvText, {
-        complete: (results: any) => {
-          setJsonData(results.data);
-        },
-        header: true, // Set to true if the first row contains headers
-      });
+        Papa.parse(csvText, {
+          complete: (results) => {
+            setJsonData(results.data);
+          },
+          header: true, // Set to true if the first row contains headers
+        });
 
-      jsonData.forEach(async (entry: any) => {
-        const instance = entry["Account address"].split("@")[1];
-        const username = entry["Account address"].split("@")[0];
-        await axios
-          .get(`https://${instance}/api/v1/accounts/lookup?acct=${username}`)
-          .then((response: any) => {
-            setMastodonAccounts((prevMastodonAccounts: any) => ({
-              ...prevMastodonAccounts,
-              [`${entry["Account address"]}`]: {
-                id: response.data[`id`],
-                instance: instance,
-                username: username,
-              },
-            }));
-          });
-      });
-    } catch (err) {
-      if (DocumentPicker.isCancel(err)) {
-        // User cancelled the picker
-      } else {
-        throw err;
+        jsonData.forEach(async (entry: any) => {
+          const instance = entry["Account address"].split("@")[1];
+          const username = entry["Account address"].split("@")[0];
+          await axios
+            .get(`https://${instance}/api/v1/accounts/lookup?acct=${username}`)
+            .then((response) => {
+              setMastodonAccounts((prevMastodonAccounts: any) => ({
+                ...prevMastodonAccounts,
+                [`${entry["Account address"]}`]: {
+                  id: response.data[`id`],
+                  instance: instance,
+                  username: username,
+                },
+              }));
+            });
+        });
       }
+    } catch (err) {
+      console.error(err);
     }
   };
 

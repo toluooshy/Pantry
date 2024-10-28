@@ -1,14 +1,8 @@
 "use es6";
 
-import { useState, useEffect, useRef } from "react";
-import { View, Text, Pressable, Platform, TextInput } from "react-native";
+import { useEffect, useRef } from "react";
+import { View, Platform, TextInput } from "react-native";
 
-import LetterIcon from "../../assets/icons/letter.svg";
-import ClockIcon from "../../assets/icons/clock.svg";
-import FireIcon from "../../assets/icons/fire.svg";
-import LetterWhiteIcon from "../../assets/icons/letterwhite.svg";
-import ClockWhiteIcon from "../../assets/icons/clockwhite.svg";
-import FireWhiteIcon from "../../assets/icons/firewhite.svg";
 import SearchIcon from "../../assets/icons/search.svg";
 import axios from "axios";
 

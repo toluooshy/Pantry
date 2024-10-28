@@ -1,10 +1,6 @@
-import { useState, useEffect } from "react";
-import axios from "axios";
-
 import {
   View,
   Text,
-  Button,
   Keyboard,
   TouchableWithoutFeedback,
   ScrollView,

@@ -2,9 +2,6 @@ import React, { useEffect, useState } from "react";
 import {
   Text,
   View,
-  Alert,
-  TouchableOpacity,
-  Platform,
   TouchableWithoutFeedback,
   Keyboard,
   ScrollView,
@@ -65,7 +62,6 @@ const AccountModal = ({
     axios
       .get(`https://mastodon.social/api/v1/accounts/${account.id}/statuses`)
       .then(async (res) => {
-        console.log(res.data);
         if (res.data) {
           const posts = res.data.map((post: any) => {
             const postdata: PostObject = {

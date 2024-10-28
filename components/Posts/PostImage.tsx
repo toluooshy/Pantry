@@ -1,9 +1,8 @@
 "use es6";
 
 import React, { useState } from "react";
-import { View, TouchableOpacity, Pressable } from "react-native";
-import FastImage from "react-native-fast-image";
-import Video from "react-native-video";
+import { View, TouchableOpacity, Pressable, Image } from "react-native";
+import { Video, ResizeMode } from "expo-av";
 
 import PostImageModal from "../../modals/PostImageModal";
 
@@ -84,10 +83,8 @@ const PostImage = ({
             source={{
               uri: uri,
             }}
-            onBuffer={handleBuffer}
             onError={handleError}
-            paused={true}
-            resizeMode="contain"
+            resizeMode={ResizeMode.CONTAIN}
             style={{
               width: width,
               height: height,
@@ -102,7 +99,7 @@ const PostImage = ({
             }
           }}
         >
-          <FastImage
+          <Image
             style={{
               borderWidth: 0.5,
               borderColor: "#aaaaaa",
@@ -113,7 +110,7 @@ const PostImage = ({
               marginRight:
                 catalogLength > 1 && index !== catalogLength - 1 ? 10 : 0,
             }}
-            resizeMode={FastImage.resizeMode.cover}
+            resizeMode={"cover"}
             source={{
               uri: uri,
             }}
